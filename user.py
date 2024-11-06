@@ -1,136 +1,184 @@
-from abc import ABC, abstractmethod
 
+from abc import ABC, abstractmethod
+from datetime import date
+
+
+# Classe base abstrata para todos os tipos de usuário
 class Usuario(ABC):
-    def __init__(self, nomeUser, senha):
+    def __init__(self, nomeUser, senha, matricula=None, email=None):
+        # Atributos encapsulados para garantir segurança
         self.__nomeUser = nomeUser
         self.__senha = senha
+        self.__matricula = matricula
+        self.__email = email
 
-    
+
+    # Métodos de acesso e modificação com encapsulamento
     def get_nomeUser(self):
         return self.__nomeUser
 
-    def set_nomeUser(self, nomeUser):
+
+    def set_nomeUser(self, nomeUser: str) -> None:
         self.__nomeUser = nomeUser
 
-    def get_senha(self):
-        return self.__senha
 
-    def set_senha(self, senha):
-        self.__senha = senha
-
+    # Verificação de senha, respeitando a privacidade dos dados
     def checar_senha(self, senha):
         return self.__senha == senha
 
+
+    # Métodos para acessar e modificar matrícula e email
+    def get_matricula(self):
+        return self.__matricula
+
+
+    def set_matricula(self, matricula):
+        self.__matricula = matricula
+
+
+    def get_email(self):
+        return self.__email
+
+
+    def set_email(self, email):
+        self.__email = email
+
+
+    # Método abstrato para ser implementado por subclasses
     @abstractmethod
     def get_user_type(self):
         pass
 
 
+# Subclasse Admin que herda de Usuario
 class Admin(Usuario):
-    def __init__(self, nomeUsuario, senha, permissoes):
-        super().__init__(nomeUsuario, senha)
-        self.__permissoes = permissoes
+    def __init__(self, nomeUser, senha, matricula, email, permissoes):
+        super().__init__(nomeUser, senha, matricula, email)
+        self.__permissoes = permissoes  # Atributo adicional para admins
 
+
+    # Implementação de método abstrato
     def get_user_type(self):
         return "Admin"
 
-   
+
+    # Método específico para acessar permissões
     def get_permissoes(self):
         return self.__permissoes
 
-    def set_permissoes(self, permissoes):
-        self.__permissoes = permissoes
 
-    def add_permissao(self, permissao):
-        self.__permissoes.append(permissao)
-
-    def remove_permissao(self, permissao):
-        if permissao in self.__permissoes:
-            self.__permissoes.remove(permissao)
-            print(f"Permissão '{permissao}' removida.")
-        else:
-            print(f"Permissão '{permissao}' não encontrada.")
-
-    def listar_permissoes(self):
-        print(f"Permissões de {self.get_nomeUser()}: {', '.join(self.__permissoes)}")
+# Subclasse Aluno
+class Aluno(Usuario):
+    def __init__(self, nomeUser, senha, matricula):
+        super().__init__(nomeUser, senha, matricula)
 
 
-class Alunos(Usuario):
-    def __init__(self, nomeUsuario, senha, matricula):
-        super().__init__(nomeUsuario, senha)
-        self.__matricula = matricula
-
+    # Aluno implementa o método abstrato
     def get_user_type(self):
-        return "Alunos"
-
-   
-    def get_matricula(self):
-        return self.__matricula
-
-    def set_matricula(self, matricula):
-        self.__matricula = matricula
-
-  
-    def exibir_informacoes(self):
-        print(f"Nome: {self.get_nomeUser()}, Matrícula: {self.get_matricula()}")
-
-  
-    def atualizar_matricula(self, nova_matricula):
-        self.set_matricula(nova_matricula)
-        print(f"Matrícula atualizada para: {self.get_matricula()}")
+        return "Aluno"
 
 
-class Servidores(Usuario):
+# Subclasse Servidor
+class Servidor(Usuario):
     def __init__(self, nomeUser, senha, email):
-        super().__init__(nomeUser, senha)
-        self.__email = email
+        super().__init__(nomeUser, senha, email=email)
 
+
+    # Servidor implementa o método abstrato
     def get_user_type(self):
-        return "Servidores"
-
-    
-    def get_email(self):
-        return self.__email
-
-    def set_email(self, email):
-        self.__email = email
-
-    
-    def exibir_informacoes(self):
-        print(f"Nome: {self.get_nomeUser()}, E-mail: {self.get_email()}")
-
-    
-    def atualizar_email(self, novo_email):
-        self.set_email(novo_email)
-        print(f"E-mail atualizado para: {self.get_email()}")
+        return "Servidor"
 
 
-class SuperUsuario(Admin):
-    def __init__(self, nomeUsuario, senha, permissoes, nivel_acesso):
-        super().__init__(nomeUsuario, senha, permissoes)
-        self.__nivel_acesso = nivel_acesso
+# Classe Departamento representa a agregação de um AtendenteReclamacao
+class Departamento:
+    def __init__(self, nome_departamento, responsavel):
+        # Nome do departamento e o responsável
+        self.__nome_departamento = nome_departamento
+        self.__responsavel = responsavel
 
-    def get_user_type(self, detalhe=False):
-        if detalhe:
-            return f"SuperUsuario com acesso nível {self.get_nivel_acesso()}"
-        return "SuperUsuario"
 
-    
-    def get_nivel_acesso(self):
-        return self.__nivel_acesso
+    # Métodos para acessar informações do departamento
+    def get_nome_departamento(self):
+        return self.__nome_departamento
 
-    def set_nivel_acesso(self, nivel_acesso):
-        self.__nivel_acesso = nivel_acesso
 
-   
-    def redefinir_senha(self, usuario, nova_senha):
-        if isinstance(usuario, Usuario):
-            usuario.set_senha(nova_senha)
-            print(f"A senha de {usuario.get_nomeUser()} foi redefinida.")
-        else:
-            print("Usuário inválido.")
+    def get_responsavel(self):
+        return self.__responsavel
 
-    
-    def aumentar_nivel_acesso(self):
-        self.set_nivel_acesso(self.get_nivel_acesso() + 1)
-        print(f"Nível de acesso de {self.get_nomeUser()} agora é {self.get_nivel_acesso()}")
+
+# Classe Reclamacao representa a associação entre Usuario e Departamento
+class Reclamacao:
+    def __init__(self, usuario, departamento, descricao):
+        # Relaciona a reclamação a um usuário e um departamento
+        self.__usuario = usuario
+        self.__departamento = departamento
+        self.__descricao = descricao
+        self.__status = "Pendente"
+        self.__data_registro = date.today()
+
+
+    # Métodos para acessar detalhes da reclamação
+    def get_usuario(self):
+        return self.__usuario.get_nomeUser()
+
+
+    def get_departamento(self):
+        return self.__departamento.get_nome_departamento()
+
+
+    def get_descricao(self):
+        return self.__descricao
+
+
+    def get_status(self):
+        return self.__status
+
+
+    def get_data(self) -> date:
+        return self.__data_registro
+
+
+    # Atualiza o status da reclamação
+    def set_status(self, status: str) -> None:
+        self.__status = status
+
+
+    # Exibe os detalhes da reclamação
+    def dados_reclamacao(self) -> None:
+        print(f"Reclamacao feita por {self.get_usuario()} no departamento {self.get_departamento()}")
+        print(f"Descrição: {self.__descricao}")
+        print(f"Status: {self.__status}")
+        print(f"Data de Registro: {self.__data_registro}")
+
+
+# Classe AtendenteReclamacao lida com reclamações de um departamento específico
+class AtendenteReclamacao:
+    def __init__(self, nome_responsavel, departamento):
+        # Nome do atendente e o departamento que ele gerencia
+        self.__nome_responsavel = nome_responsavel
+        self.__departamento = departamento
+
+
+    # Métodos para acessar detalhes do atendente
+    def get_nome_responsavel(self):
+        return self.__nome_responsavel
+
+
+    def get_nome_departamento(self) -> str:
+        return self.__departamento
+
+
+    # Método para responder reclamações atribuídas ao departamento do atendente
+    def responder_reclamacao(self, reclamacao: Reclamacao, resposta: str) -> str:
+        if reclamacao.get_departamento() == self.get_nome_departamento():
+            reclamacao.set_status("Respondida")
+            return f"Reclamacao respondida por {self.__nome_responsavel}: {resposta}"
+        return "Reclamacao pertence a outro departamento."
+
+
+    # Exibe detalhes do atendente
+    def dados_responsavel(self) -> None:
+        print(f"Responsável: {self.__nome_responsavel}")
+        print(f"Departamento: {self.get_nome_departamento()}")
+
+

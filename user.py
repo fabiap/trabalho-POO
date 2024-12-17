@@ -12,36 +12,35 @@ class Usuario(ABC):
         self.__matricula = matricula
         self.__email = email
 
-
     # Métodos de acesso e modificação com encapsulamento
     def get_nomeUser(self):
         return self.__nomeUser
 
-
     def set_nomeUser(self, nomeUser: str) -> None:
         self.__nomeUser = nomeUser
-
 
     # Verificação de senha, respeitando a privacidade dos dados
     def checar_senha(self, senha):
         return self.__senha == senha
 
-
     # Métodos para acessar e modificar matrícula e email
     def get_matricula(self):
         return self.__matricula
 
-
     def set_matricula(self, matricula):
         self.__matricula = matricula
-
 
     def get_email(self):
         return self.__email
 
-
     def set_email(self, email):
         self.__email = email
+        
+    def get_senha(self):
+        return self.__senha
+    
+    def set_senha(self, senha):
+        self.__senha = senha
 
 
     # Método abstrato para ser implementado por subclasses
@@ -82,7 +81,6 @@ class Aluno(Usuario):
     def get_senha(self):
         return self.senha
 
-
     # Aluno implementa o método abstrato
     def get_user_type(self):
         return "Aluno"
@@ -92,7 +90,6 @@ class Aluno(Usuario):
 class Servidor(Usuario):
     def __init__(self, nomeUser, senha, email):
         super().__init__(nomeUser, senha, email=email)
-
 
     # Servidor implementa o método abstrato
     def get_user_type(self):
@@ -198,3 +195,12 @@ class DepartamentoNaoDefinidoException(Exception):
     pass
 
 
+class emailInvalido(Exception):
+    pass
+
+class senhaInvalida(Exception):
+    pass
+
+class NomeRepetido(Exception):
+    def __init__(self, nome):
+        super().__init__(f"Nome de usuário '{nome}' já está cadastrado no sistema.")

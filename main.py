@@ -8,7 +8,7 @@
 # é pra começar fazendo o cadrasto :d
 
 # Importações das classes necessárias
-from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario, senhaInvalida, emailInvalido, NomeRepetido
+from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario,LoginInvalidoException, DepartamentoNaoDefinidoException,senhaInvalida, emailInvalido, NomeRepetido
 from datetime import date
 
 
@@ -148,14 +148,19 @@ def login(usuario, senha):
             else:
                 print("E-mail incorreto!")
 
-
         elif isinstance(usuario, Admin):
             menu_admin(usuario)
 
         elif isinstance(usuario, AtendenteReclamacao):
             menu_atendente(usuario)
-    else:
-        print("Senha Inválida!")
+        
+    try:
+        if usuario.get_senha() != senha:
+            raise LoginInvalidoException("Senha errasdvgv!")
+        print(f"Login bem-sucedido! Bem-vindo, {usuario.get_nomeUser()}.")
+    except LoginInvalidoException as e:
+            print(e)
+
 
 
      
@@ -292,3 +297,15 @@ def menu_atendente(atendente):
             break
         else:
             print("Escolha inválida. Tente novamente.")
+            
+
+
+# Reclamação sem departamento
+def criar_reclamacao(usuario, departamento, descricao):
+    try:
+        if not departamento:
+            raise DepartamentoNaoDefinidoException("Departamento não pode ser vazio.")
+        reclamacao = Reclamacao(usuario, departamento, descricao)
+        print("Reclamação criada com sucesso!")
+    except DepartamentoNaoDefinidoException as e:
+        print(e)

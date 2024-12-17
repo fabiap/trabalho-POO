@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 from datetime import date
-
+#OIIIIIII
 
 # Classe base abstrata para todos os tipos de usuário
 class Usuario(ABC):
@@ -71,6 +71,15 @@ class Admin(Usuario):
 class Aluno(Usuario):
     def __init__(self, nomeUser, senha, matricula):
         super().__init__(nomeUser, senha, matricula)
+        self.senha = senha
+        self.__matricula = matricula
+        
+        
+    def get_matricula(self):
+        return self.__matricula
+    
+    def get_senha(self):
+        return self.senha
 
     # Aluno implementa o método abstrato
     def get_user_type(self):
@@ -178,6 +187,12 @@ class AtendenteReclamacao:
     def dados_responsavel(self) -> None:
         print(f"Responsável: {self.__nome_responsavel}")
         print(f"Departamento: {self.get_nome_departamento()}")
+
+class LoginInvalidoException(Exception):
+    pass
+
+class DepartamentoNaoDefinidoException(Exception):
+    pass
 
 
 class emailInvalido(Exception):

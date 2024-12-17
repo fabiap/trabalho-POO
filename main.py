@@ -12,12 +12,9 @@ from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteRecl
 from datetime import date
 
 
-#admin1 = Admin("fabia", "123", "12345", "fabia@paula", "deletar")
-
-
 # "Banco de dados" falso
 usuarios = {}
-
+usuarios["admin"] = Admin("fabia", "1234", "2023", "fabia@admin.com", "tudo")
 
 # Lista para armazenar reclamações
 reclamacoes = []
@@ -122,6 +119,9 @@ def login(usuario, senha):
 
         elif isinstance(usuario, Admin):
             menu_admin(usuario)
+
+        elif isinstance(usuario, AtendenteReclamacao):
+            menu_atendente(usuario)
     else:
         print("Senha Inválida!")
 
@@ -173,7 +173,7 @@ def gerenciar_reclamacoes(admin):
         resposta = input("Digite a resposta (ou pressione Enter para pular): ").strip()
         if resposta:
             reclamacao.set_status("Respondida")
-            print(f"Resposta registrada: {resposta}")
+            print(f"Resposta registrada pelo Admin {admin.get_nomeUser()}: {resposta}")
 
 
 # Menu de opções para os Admins
@@ -238,4 +238,25 @@ if __name__ == "__main__":
     iniciar_sistema()
 
 
-#pedencias no código: uma maneira do atendente responder a reclamaçao; acessar o admin.
+#pedencias no código: uma maneira do atendente responder a reclamaçao; acessar o admin. - feitas.
+#fazer excessoes de email e senha
+
+
+#menu atendente (admin)
+def menu_atendente(atendente):
+    while True:
+        print("\n--- Menu Atendente ---")
+        print("1. Responder reclamações do meu departamento")
+        print("2. Sair")
+        escolha = input("Escolha uma opção: ").strip()
+
+        if escolha == "1":
+            for reclamacao in reclamacoes:
+                if reclamacao.get_departamento() == atendente.get_nome_departamento() and reclamacao.get_status() == "Pendente":
+                    reclamacao.dados_reclamacao()
+                    resposta = input("Digite sua resposta: ").strip()
+                    print(atendente.responder_reclamacao(reclamacao, resposta))
+        elif escolha == "2":
+            break
+        else:
+            print("Escolha inválida. Tente novamente.")

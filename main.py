@@ -8,11 +8,12 @@
 # é pra começar fazendo o cadrasto :d
 
 # Importações das classes necessárias
-from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario
+from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario, senhaInvalida, emailInvalido, NomeRepetido
 from datetime import date
 
 
 # "Banco de dados" falso
+
 usuarios = {}
 usuarios["admin"] = Admin("fabia", "1234", "2023", "fabia@admin.com", "tudo")
 
@@ -37,34 +38,65 @@ def inicializar_departamentos():
     departamentos["1"] = dep_comida
     departamentos["2"] = dep_limpeza
     departamentos["3"] = dep_infraestrutura
+    
+
+#funçao exceção
+def validaremail(email):
+     if "@" not in email or "." not in email:
+         raise emailInvalido("email invalido")
+
+
+def validarsenha(senha):
+    if len(senha) < 4:
+        raise senhaInvalida("a senha precisa de mais de 4 caracteres.")
+    
+    
 
 
 # Função para cadastrar um novo usuário
 def cadastrar_usuario():
     print("\n--- Cadastro de Novo Usuário ---")
-    tipo = input("Digite o tipo de usuário (1-Alunos, 2- Servidores): ")
-    nome = input("Digite o nome de usuário: ").strip()
-    senha = input("Digite a senha: ").strip()
+    try:
+        tipo = input("Digite o tipo de usuário (1-Alunos, 2- Servidores): ")
+        
+        nome = input("Digite o nome de usuário: ").strip()
+        if nome in usuarios: 
+            raise NomeRepetido(nome)
+       
+       #exceção para caso o usuario digite algo incorreto
+        email = input("Digite o email(email valido): ").strip()
+        validaremail(email)
+        
+        senha = input("Digite a senha(mais de 4 caracteres): ").strip()
+        validarsenha(senha)
 
+        # Verifica o tipo de usuário para cadastrar corretamente
+        if tipo == "1":
+            matricula = input("Digite a matrícula: ").strip()
+            novo_usuario = Aluno(nome, senha, matricula)
+        elif tipo == "2":
+            email = input("Digite o e-mail: ").strip()
+            novo_usuario = Servidor(nome, senha, email)
+        else:
+            print("Tipo de usuário inválido!")
+            return None
 
-    # Verifica o tipo de usuário para cadastrar corretamente
-    if tipo == "1":
-        matricula = input("Digite a matrícula: ").strip()
-        novo_usuario = Aluno(nome, senha, matricula)
-    elif tipo == "2":
-        email = input("Digite o e-mail: ").strip()
-        novo_usuario = Servidor(nome, senha, email)
-    else:
-        print("Tipo de usuário inválido!")
-        return None
-
-
-    # Verifica se o usuário já existe
-    if nome in usuarios:
-        print("Usuário já existe!")
-    else:
-        usuarios[nome] = novo_usuario
-        print(f"Usuário {nome} cadastrado com sucesso!")
+        # Verifica se o usuário já existe
+        if nome in usuarios:
+            print("Usuário já existe!")
+        else:
+            usuarios[nome] = novo_usuario
+            print(f"Usuário {nome} cadastrado com sucesso!")
+            
+    except emailInvalido as e:
+        print(e)
+    except senhaInvalida as e:
+        print(e)
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+    finally: 
+        print("usuario nao foi cadastrado")
+ 
 
 
 # Função para fazer uma reclamação vinculada a um departamento
@@ -238,7 +270,7 @@ if __name__ == "__main__":
     iniciar_sistema()
 
 
-#pedencias no código: uma maneira do atendente responder a reclamaçao; acessar o admin. - feitas.
+#pedencias no código: uma maneira do atendente responder a reclamaçao; acessar o admin
 #fazer excessoes de email e senha
 
 

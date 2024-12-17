@@ -52,14 +52,15 @@ class Usuario(ABC):
 
 # Subclasse Admin que herda de Usuario
 class Admin(Usuario):
-    def __init__(self, nomeUser, senha, matricula, email, permissoes):
+    def __init__(self, nomeUser, senha, matricula, email, departamento):
         super().__init__(nomeUser, senha, matricula, email)
-        self.__permissoes = permissoes  # Atributo adicional para admins
+        self.__departamento = departamento  # Atributo adicional para admins
 
-
-    # Implementação de método abstrato
     def get_user_type(self):
         return "Admin"
+    
+    def __str__(self):
+        return f"Admin: {self._Usuario__nomeUser}, Matricula: {self._Usuario__matricula}, Email: {self._Usuario__email}, Departamento: {self.__departamento}"
 
 
     # Método específico para acessar permissões

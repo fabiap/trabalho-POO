@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 from datetime import date
-
+#OIIIIIII
 
 # Classe base abstrata para todos os tipos de usuário
 class Usuario(ABC):

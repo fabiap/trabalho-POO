@@ -10,12 +10,12 @@
 # Importações das classes necessárias
 from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario, LoginInvalidoException, DepartamentoNaoDefinidoException
 from datetime import date
-
+from collections import deque
 
 # "Banco de dados" falso
 usuarios = {}
-usuarios["admin"] = Admin("fabia", "1234", "2023", "fabia@admin.com", "tudo")
-
+admin = Admin("admin", "1234", "admin@admin.com", "geral", "oi")
+usuarios["admin"] = admin 
 # Lista para armazenar reclamações
 reclamacoes = []
 # Dicionário para armazenar departamentos e seus atendentes
@@ -37,6 +37,13 @@ def inicializar_departamentos():
     departamentos["1"] = dep_comida
     departamentos["2"] = dep_limpeza
     departamentos["3"] = dep_infraestrutura
+
+# Função auxiliar para buscar o departamento pelo nome
+def buscar_departamento(nome_departamento):
+    for dep in departamentos:  # departamentos é a lista de objetos Departamento
+        if dep.get_nome_departamento() == nome_departamento:
+            return dep
+    return None  # Retorna None caso o departamento não seja encontrado
 
 
 # Função para cadastrar um novo usuário
@@ -180,6 +187,34 @@ def gerenciar_reclamacoes(admin):
             reclamacao.set_status("Respondida")
             print(f"Resposta registrada pelo Admin {admin.get_nomeUser()}: {resposta}")
 
+# Reclamação sem departamento
+def criar_reclamacao(usuario, departamento, descricao):
+    try:
+        if not departamento:
+            raise DepartamentoNaoDefinidoException("Departamento não pode ser vazio.")
+        reclamacao = Reclamacao(usuario, departamento, descricao)
+        print("Reclamação criada com sucesso!")
+    except DepartamentoNaoDefinidoException as e:
+        print(e)
+
+# Coleção para armazenar reclamações em ordem de chegada
+fila_reclamacoes = deque()
+
+def adicionar_reclamacao_na_fila(reclamacao):
+    fila_reclamacoes.append(reclamacao)
+    print("Reclamação adicionada na fila!")
+
+def processar_reclamacoes():
+    if not fila_reclamacoes:
+        print("Nenhuma reclamação pendente na fila!")
+        return
+
+    print("\n--- Processando Reclamações ---")
+    while fila_reclamacoes:
+        reclamacao = fila_reclamacoes.popleft()
+        reclamacao.dados_reclamacao()
+        print("Reclamação processada e removida da fila!\n")
+
 
 # Menu de opções para os Admins
 def menu_admin(admin):
@@ -188,7 +223,9 @@ def menu_admin(admin):
         print("1. Cadastrar usuário")
         print("2. Gerenciar reclamações")
         print("3. Listar todas as reclamações")
-        print("4. Sair")
+        print("4. Adicionar reclamação na fila")
+        print("5. Processar reclamações na fila")
+        print("6. Sair")
         escolha = input("Escolha uma opção: ").strip()
 
 
@@ -198,7 +235,21 @@ def menu_admin(admin):
             gerenciar_reclamacoes(admin)
         elif escolha == "3":
             listar_todas_reclamacoes()
-        elif escolha == "4":
+        elif escolha == "4":  # Adicionar reclamação na fila
+            descricao = input("Digite a descrição da reclamação: ").strip()
+            nome_departamento = input("Digite o nome do departamento: ").strip()
+
+            # Buscar o departamento correto
+            departamento = buscar_departamento(nome_departamento)
+            
+            if departamento:  # Departamento encontrado
+                reclamacao = Reclamacao(admin, departamento, descricao)
+                adicionar_reclamacao_na_fila(reclamacao)
+            else:
+                print("Departamento não encontrado! Verifique o nome e tente novamente.")
+        elif escolha == "5":
+            processar_reclamacoes()
+        elif escolha == "6":
             break
         else:
             print("Escolha inválida. Tente novamente.")
@@ -267,13 +318,25 @@ def menu_atendente(atendente):
             print("Escolha inválida. Tente novamente.")
             
 
+# Demonstração de diferentes coleções
+def demonstrar_colecoes():
+    print("\n--- Demonstração de Coleções em Python ---")
 
-# Reclamação sem departamento
-def criar_reclamacao(usuario, departamento, descricao):
-    try:
-        if not departamento:
-            raise DepartamentoNaoDefinidoException("Departamento não pode ser vazio.")
-        reclamacao = Reclamacao(usuario, departamento, descricao)
-        print("Reclamação criada com sucesso!")
-    except DepartamentoNaoDefinidoException as e:
-        print(e)
+    # List
+    lista_usuarios = ["admin", "atendente1", "usuario1"]
+    print("Lista de Usuários:", lista_usuarios)
+
+    # Set
+    conjunto_departamentos = {"Limpeza", "TI", "RH"}
+    print("Conjunto de Departamentos:", conjunto_departamentos)
+
+    # Tuple
+    tupla_permissoes = ("Admin", "Atendente", "Usuario")
+    print("Tupla de Permissões:", tupla_permissoes)
+
+    # Dict
+    dicionario_reclamacoes = {"Limpeza": 5, "TI": 10, "RH": 3}
+    print("Dicionário de Reclamações:", dicionario_reclamacoes)
+
+    # Deque (Fila)
+    print("Fila de Reclamações (deque):", list(fila_reclamacoes))

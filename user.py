@@ -197,4 +197,53 @@ class LoginInvalidoException(Exception):
 class DepartamentoNaoDefinidoException(Exception):
     pass
 
+class DepartamentoNaoEncontradoException(Exception):
+    """Exceção personalizada para departamentos inexistentes."""
+    def _init_(self, departamento_nome):
+        super()._init_(f"Erro: O departamento '{departamento_nome}' não foi encontrado no sistema.")
 
+
+
+class ColecaoDepartamentos:
+    """Classe responsável por gerenciar uma coleção de departamentos."""
+    def _init_(self):
+        self.departamentos = {}
+
+    def adicionar_departamento(self, nome_departamento):
+        """Adiciona um departamento à coleção."""
+        if nome_departamento not in self.departamentos:
+            self.departamentos[nome_departamento] = Departamento(nome_departamento)
+
+    def listar_departamentos(self):
+        """Lista todos os departamentos e suas reclamações associadas."""
+        if not self.departamentos:
+            print("Nenhum departamento cadastrado.")
+            return
+
+        for nome, departamento in self.departamentos.items():
+            print(f"\nDepartamento: {nome}")
+            if departamento.reclamacoes:
+                print("Reclamações:")
+                for reclamacao in departamento.reclamacoes:
+                    print(f"  - Título: {reclamacao.titulo}")
+                    print(f"    Descrição: {reclamacao.descricao}")
+            else:
+                print("Sem reclamações associadas.")
+
+    def contar_departamentos(self):
+        """Retorna o número de departamentos na coleção."""
+        return len(self.departamentos)
+
+    def contar_reclamacoes(self):
+        """Retorna o número total de reclamações em todos os departamentos."""
+        total_reclamacoes = 0
+        for departamento in self.departamentos.values():
+            total_reclamacoes += departamento.contar_reclamacoes()
+        return total_reclamacoes
+
+    def buscar_departamento(self, nome_parcial):
+        """Busca um departamento pelo nome ou parte do nome."""
+        for nome, departamento in self.departamentos.items():
+            if nome_parcial.lower() in nome.lower():
+                return departamento
+        raise DepartamentoNaoEncontradoException(nome_parcial)

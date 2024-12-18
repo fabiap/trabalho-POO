@@ -8,7 +8,7 @@
 # é pra começar fazendo o cadrasto :d
 
 # Importações das classes necessárias
-from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario, LoginInvalidoException, DepartamentoNaoDefinidoException
+from user import Admin, Aluno, Servidor, Reclamacao, Departamento, AtendenteReclamacao, Usuario, LoginInvalidoException, DepartamentoNaoDefinidoException, ColecaoDepartamentos
 from datetime import date
 
 
@@ -277,3 +277,70 @@ def criar_reclamacao(usuario, departamento, descricao):
         print("Reclamação criada com sucesso!")
     except DepartamentoNaoDefinidoException as e:
         print(e)
+
+if _name_ == "_main_":
+    sistema = ColecaoDepartamentos()
+
+    # Adicionar departamentos ao sistema
+    nomes_departamentos = [
+        "Departamento de Apoio ao Ensino (dape)",
+        "Direção de Ensino (de)",
+        "Coordenação de Gestão de Tecnologia da Informação (cgti)",
+        "Coordenação de Gestão de Pessoas (cgp)",
+        "Coordenação de Comunicação e Eventos (ccom)",
+        "Direção-Geral (dg)",
+        "Biblioteca (cbib)",
+        "Departamentos de Assistência Estudantil (depae)",
+        "Departamento de Extensão (depex)",
+        "Departamento de Pesquisa, Inovação e Pós-graduação (depesp)",
+        "Coordenação de Patrimônio e Almoxarifado (cpalm)",
+        "Coordenação de Orçamento e Finanças (cofin)",
+        "Coordenação de Serviços Gerais (csg)",
+        "Coordenação de Compras e Licitação (ccl)",
+    ]
+
+    for nome in nomes_departamentos:
+        sistema.adicionar_departamento(nome)
+
+    # Menu interativo
+    while True:
+        print("\n--- Sistema de Reclamações ---")
+        print("1. Fazer uma reclamação")
+        print("2. Listar todos os departamentos e suas reclamações")
+        print("3. Contar departamentos e reclamações")
+        print("4. Sair")
+
+        opcao = input("\nEscolha uma opção: ")
+
+        if opcao == "1":
+            sistema.listar_departamentos()
+            nome_parcial = input("\nDigite o nome ou sigla do departamento que deseja reclamar: ")
+
+            try:
+                departamento = sistema.buscar_departamento(nome_parcial)
+                titulo = input("Digite o título da reclamação: ")
+                descricao = input("Digite a descrição da reclamação: ")
+
+                reclamacao = Reclamacao(titulo, descricao)
+                departamento.adicionar_reclamacao(reclamacao)
+
+                print("Problema relatado com sucesso!")
+            except Exception as e:
+                print(e)
+
+        elif opcao == "2":
+            sistema.listar_departamentos()
+
+        elif opcao == "3":
+            total_departamentos = sistema.contar_departamentos()
+            total_reclamacoes = sistema.contar_reclamacoes()
+
+            print(f"\nTotal de departamentos cadastrados: {total_departamentos}")
+            print(f"Total de reclamações registradas: {total_reclamacoes}")
+
+        elif opcao == "4":
+            print("Saindo do sistema...")
+            break
+
+        else:
+            print("Opção inválida. Tente novamente.")

@@ -268,7 +268,7 @@ def menu_atendente(atendente):
             
 
 
-# Reclamação sem departamento
+#Reclamação sem departamento
 def criar_reclamacao(usuario, departamento, descricao):
     try:
         if not departamento:
